@@ -1,6 +1,7 @@
 # -*- encoding: utf-8 -*-
 import board
 import os
+import time
 
 UNICODE_PIECES = {
   'r': u'♜', 'n': u'♞', 'b': u'♝', 'q': u'♛',
@@ -8,6 +9,11 @@ UNICODE_PIECES = {
   'B': u'♗', 'Q': u'♕', 'K': u'♔', 'P': u'♙',
   None: ' '
 }
+
+def printAndWait(text):
+    print text
+    print "Press return to continue"
+    raw_input()
 
 class BoardGuiConsole(object):
     '''
@@ -18,23 +24,39 @@ class BoardGuiConsole(object):
     def __init__(self, chessboard):
         self.board = chessboard
 
-    def move(self):
-        os.system("clear")
-        self.unicode_representation()
-        print "\n", self.error
-        print "State a move in chess notation (e.g. A2A3). Type \"exit\" to leave:\n", ">>>",
+    def prompt(self):
         self.error = ''
+        print ('State a move in chess notation (e.g. A2A3).\n'
+            "State a piece's coordinates to see it's valid moves (e.g. A2).\n"
+            'Type \"exit\" to leave:')
+        print '>>>', 
         coord = raw_input()
         if coord == "exit":
             print "Bye."
             exit(0)
-        try:
-            if len(coord) != 4: raise board.InvalidCoord
-            self.board.move(coord[0:2], coord[2:4])
-            os.system("clear")
-        except board.ChessError as error:
-            self.error = "Error: %s" % error.__class__.__name__
+        if len(coord) == 2:
+            try:
+                if coord in (self.board.occupied("white") + self.board.occupied("black")):
+                    printAndWait("Possible move for {} is {}".format(self.board[coord].abbriviation ,self.board[coord].possible_moves(coord)))
+                else:
+                    printAndWait("No Piece is located at {}".format(coord))
+            except board.ChessError as error:
+                self.error = "Error: %s" % error.__class__.__name__
+        elif len(coord) == 4:
+            try:
+                if len(coord) != 4: raise board.InvalidCoord
+                self.board.move(coord[0:2], coord[2:4])
+                os.system("clear")
+            except board.ChessError as error:
+                self.error = "Error: %s" % error.__class__.__name__
+        else:
+            printAndWait("Invalid Input. Press the return key to continue")
 
+    def move(self):
+        os.system("clear")
+        self.unicode_representation()
+        print "\n", self.error
+        self.prompt()
         self.move()
 
     def unicode_representation(self):
