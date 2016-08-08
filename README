@@ -22,5 +22,6 @@ TODO:
     * En passant
     * Pawn promotion
     * Fifty-move rule
-    * Tests
+    * Tests & manual test to find bugs and edges
     * Scalable GUI window
+    * Refactor for higher level abstraction
