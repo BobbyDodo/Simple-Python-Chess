@@ -25,3 +25,4 @@ TODO:
     * Tests & manual test to find bugs and edges
     * Scalable GUI window
     * Refactor for higher level abstraction
+    * Add real sanitization for proper input in gui_console.py/prompt
