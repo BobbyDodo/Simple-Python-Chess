@@ -10,11 +10,6 @@ UNICODE_PIECES = {
   None: ' '
 }
 
-def printAndWait(text):
-    print text
-    print "Press return to continue"
-    raw_input()
-
 class BoardGuiConsole(object):
     '''
         Print a text-mode chessboard using the unicode chess pieces
@@ -29,7 +24,7 @@ class BoardGuiConsole(object):
         print ('State a move in chess notation (e.g. A2A3).\n'
             "State a piece's coordinates to see it's valid moves (e.g. A2).\n"
             'Type \"exit\" to leave:')
-        print '>>>', 
+        print '>>>',
         coord = raw_input()
         if coord == "exit":
             print "Bye."
@@ -37,9 +32,9 @@ class BoardGuiConsole(object):
         if len(coord) == 2:
             try:
                 if coord in (self.board.occupied("white") + self.board.occupied("black")):
-                    printAndWait("Possible move for {} is {}".format(self.board[coord].abbriviation ,self.board[coord].possible_moves(coord)))
+                    self.error = "Possible move for {} is {}".format(self.board[coord].abbriviation ,self.board[coord].possible_moves(coord))
                 else:
-                    printAndWait("No Piece is located at {}".format(coord))
+                    self.error = "No Piece is located at {}".format(coord)
             except board.ChessError as error:
                 self.error = "Error: %s" % error.__class__.__name__
         elif len(coord) == 4:
@@ -50,12 +45,14 @@ class BoardGuiConsole(object):
             except board.ChessError as error:
                 self.error = "Error: %s" % error.__class__.__name__
         else:
-            printAndWait("Invalid Input. Press the return key to continue")
+            self.error = "Invalid Input: {}".format(coord)
 
     def move(self):
         os.system("clear")
         self.unicode_representation()
-        print "\n", self.error
+        print ('------------------------\n'
+            '{}'
+            '\n------------------------').format(self.error)
         self.prompt()
         self.move()
 
