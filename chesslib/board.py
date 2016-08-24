@@ -65,7 +65,8 @@ class Board(dict):
         tmp._do_move(p1,p2)
         return tmp.is_in_check(self[p1].color)
 
-    def move(self, p1, p2):
+    def can_move(self, p1, p2):
+        # Sanitization
         p1, p2 = p1.upper(), p2.upper()
         piece = self[p1]
         dest  = self[p2]
@@ -83,29 +84,32 @@ class Board(dict):
         if self.all_possible_moves(enemy):
             if self.is_in_check_after_move(p1,p2):
                 raise Check
-
         if not possible_moves and self.is_in_check(piece.color):
             raise CheckMate
         elif not possible_moves:
             raise Draw
-        else:
-            self._do_move(p1, p2)
-            self._finish_move(piece, dest, p1,p2)
 
-    def get_enemy(self, color):
-        if color == "white": return "black"
-        else: return "white"
+        return True
 
-    def _do_move(self, p1, p2):
-        '''
-            Move a piece without validation
-        '''
+    def move(self, p1, p2):
+        p1, p2 = p1.upper(), p2.upper()
         piece = self[p1]
         dest  = self[p2]
-        del self[p1]
-        self[p2] = piece
 
-    def _finish_move(self, piece, dest, p1, p2):
+        if self.can_move(p1,p2):
+            piece = self[p1]
+            dest  = self[p2]
+            del self[p1]
+            self[p2] = piece
+            self._resolve_turn(piece, dest, p1,p2)
+
+    def get_enemy(self, color):
+        if color == "white": 
+            return "black"
+        else: 
+            return "white"
+
+    def _resolve_turn(self, piece, dest, p1, p2):
         '''
             Set next player turn, count moves, log moves, etc.
         '''
@@ -159,7 +163,6 @@ class Board(dict):
 
     def is_king(self, piece):
         return isinstance(piece, pieces.King)
-
 
     def get_king_position(self, color):
         for pos in self.keys():
